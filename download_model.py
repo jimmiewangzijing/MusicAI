@@ -9,7 +9,8 @@ def download_file(url, filename):
     """
     使用 requests 下载文件，显示进度条
     """
-    response = requests.get(url, stream=True)
+    # 在requests.get中添加verify=False参数
+    response = requests.get(url, stream=True, verify=False)
     total_size = int(response.headers.get('content-length', 0))
     
     with open(filename, 'wb') as f, tqdm(
@@ -35,7 +36,8 @@ def setup_spleeter_model():
     os.makedirs(pretrained_dir, exist_ok=True)
     
     # 模型文件 URL（使用国内镜像）
-    model_url = "https://ghproxy.com/https://github.com/deezer/spleeter/releases/download/v1.4.0/2stems.tar.gz"
+    # 将第XX行的下载链接改为原始地址
+    MODEL_URL = 'https://github.com/deezer/spleeter/releases/download/v1.4.0/2stems.tar.gz'
     model_file = "2stems.tar.gz"
     
     print("开始下载 Spleeter 模型...")
@@ -59,4 +61,4 @@ def setup_spleeter_model():
         sys.exit(1)
 
 if __name__ == "__main__":
-    setup_spleeter_model() 
+    setup_spleeter_model()
