@@ -20,11 +20,14 @@ os.environ['PATH'] = os.environ['PATH'] + os.pathsep + r'C:\Users\Jimmie\AppData
 
 class MusicProcessor:
     def __init__(self):
-        # 检查是否已下载模型
-        local_model_path = os.path.join(os.getcwd(), 'pretrained_models')
+        # 检查并下载必需的模型
+        self._setup_models()
         
         # 使用2stems模型代替5stems，因为它更小更常用
         model_name = 'spleeter:2stems'
+        
+        # 检查本地模型路径
+        local_model_path = os.path.join(os.getcwd(), 'pretrained_models')
         
         # 检查模型是否存在
         if os.path.exists(local_model_path):
@@ -48,6 +51,51 @@ class MusicProcessor:
             download(model_name)
             # 重新初始化
             self.separator = Separator(model_name, multiprocess=False)
+    
+    def _setup_models(self):
+        """
+        检查并下载必需的模型
+        """
+        print("🔍 检查模型状态...")
+        
+        # 检查并导入模型管理器
+        try:
+            from model_manager import ModelManager
+            manager = ModelManager()
+            
+            # 检查模型状态
+            status = manager.get_model_status()
+            
+            missing_models = []
+            for model_name, info in status.items():
+                if not info["exists"]:
+                    missing_models.append(model_name)
+                else:
+                    print(f"✅ {model_name}: 已安装")
+            
+            if missing_models:
+                print(f"⚠️ 发现 {len(missing_models)} 个缺失的模型:")
+                for model in missing_models:
+                    print(f"   - {model}")
+                
+                print("\n📥 开始自动下载缺失的模型...")
+                
+                # 自动下载所有缺失的模型
+                for model_name in missing_models:
+                    print(f"\n📥 下载 {model_name}...")
+                    if manager.download_model(model_name):
+                        print(f"✅ {model_name} 下载完成")
+                    else:
+                        print(f"❌ {model_name} 下载失败")
+                        
+                print("\n🎉 模型设置完成！")
+            else:
+                print("✅ 所有必需的模型都已安装")
+                
+        except ImportError:
+            print("⚠️ 模型管理器不可用，跳过模型检查")
+        except Exception as e:
+            print(f"⚠️ 模型检查失败: {str(e)}")
         
     def separate_vocals(self, input_file, output_dir):
         """

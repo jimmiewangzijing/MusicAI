@@ -49,6 +49,7 @@ vosk-model/
 *.mid
 *.musicxml
 *.tar.gz
+*.zip
 
 # Logs
 *.log
