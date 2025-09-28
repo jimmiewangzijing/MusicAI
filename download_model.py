@@ -37,28 +37,42 @@ def setup_spleeter_model():
     
     # 模型文件 URL（使用国内镜像）
     # 将第XX行的下载链接改为原始地址
-    MODEL_URL = 'https://github.com/deezer/spleeter/releases/download/v1.4.0/2stems.tar.gz'
+    model_url = 'https://github.com/deezer/spleeter/releases/download/v1.4.0/2stems.tar.gz'
     model_file = "2stems.tar.gz"
     
-    print("开始下载 Spleeter 模型...")
-    try:
-        # 下载模型文件
-        download_file(model_url, model_file)
-        
-        print("解压模型文件...")
-        # 解压文件
-        with tarfile.open(model_file, 'r:gz') as tar:
-            tar.extractall(pretrained_dir)
-        
-        # 清理临时文件
-        os.remove(model_file)
-        
-        print("模型设置完成！")
-        print(f"模型文件保存在: {pretrained_dir}")
-        
-    except Exception as e:
-        print(f"下载或解压过程中出错: {str(e)}")
-        sys.exit(1)
+    # 检查当前目录是否已有模型文件
+    if os.path.exists(model_file):
+        print(f"在当前目录找到模型文件 {model_file}，将直接使用该文件")
+        try:
+            print("解压模型文件...")
+            # 解压文件
+            with tarfile.open(model_file, 'r:gz') as tar:
+                tar.extractall(pretrained_dir)
+            
+            print("模型设置完成！")
+            print(f"模型文件保存在: {pretrained_dir}")
+        except Exception as e:
+            print(f"解压过程中出错: {str(e)}")
+            sys.exit(1)
+    else:
+        print("开始下载 Spleeter 模型...")
+        try:
+            # 下载模型文件
+            download_file(model_url, model_file)
+            
+            print("解压模型文件...")
+            # 解压文件
+            with tarfile.open(model_file, 'r:gz') as tar:
+                tar.extractall(pretrained_dir)
+            
+            # 清理临时文件
+            os.remove(model_file)
+            
+            print("模型设置完成！")
+            print(f"模型文件保存在: {pretrained_dir}")
+        except Exception as e:
+            print(f"下载或解压过程中出错: {str(e)}")
+            sys.exit(1)
 
 if __name__ == "__main__":
     setup_spleeter_model()
